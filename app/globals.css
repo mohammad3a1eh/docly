@@ -133,7 +133,9 @@
 .tiptap a { @apply text-primary underline underline-offset-4; }
 .tiptap img { @apply rounded-lg max-w-full my-4; }
 .tiptap table { @apply w-full border-collapse my-4; }
-.tiptap th, .tiptap td { @apply border px-3 py-2 text-sm text-left; }
+.tiptap th, .tiptap td { @apply border px-3 py-2 text-sm; }
+.tiptap th:dir(rtl), .tiptap td:dir(rtl), [dir="rtl"] .tiptap th, [dir="rtl"] .tiptap td { text-align: right; }
+.tiptap th:dir(ltr), .tiptap td:dir(ltr), [dir="ltr"] .tiptap th, [dir="ltr"] .tiptap td { text-align: left; }
 .tiptap th { @apply bg-muted font-semibold; }
 .tiptap hr { @apply my-6 border-t; }
 .tiptap mark { @apply bg-yellow-200 dark:bg-yellow-800 px-0.5 rounded; }
