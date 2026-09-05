@@ -36,14 +36,24 @@ export function FileList() {
     if (res.ok) load(q)
   }
 
+  const uploadFiles = async (files: FileList | File[]) => {
+    for (const file of Array.from(files)) {
+      if (!file.name.endsWith('.md') && !file.name.endsWith('.markdown')) continue
+      const fd = new FormData()
+      fd.append('file', file)
+      await fetch('/api/documents/upload', { method: 'POST', body: fd })
+    }
+    load(q)
+  }
   const upload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const fd = new FormData()
-    fd.append('file', file)
-    const res = await fetch('/api/documents/upload', { method: 'POST', body: fd })
-    if (res.ok) load(q)
+    if (e.target.files) await uploadFiles(e.target.files)
     e.target.value = ''
+  }
+  const [drag, setDrag] = useState(false)
+  const onDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    setDrag(false)
+    if (e.dataTransfer.files.length) await uploadFiles(e.dataTransfer.files)
   }
 
   const rename = async (doc: Doc) => {
@@ -73,19 +83,20 @@ export function FileList() {
   if (loading) return <div className="p-6">Loading…</div>
 
   return (
-    <div className="p-6">
+    <div className="p-6" onDragOver={(e) => { e.preventDefault(); setDrag(true) }} onDragLeave={() => setDrag(false)} onDrop={onDrop}>
       <div className="flex flex-wrap gap-2 mb-4">
         <button onClick={create} className="px-3 py-1.5 text-sm bg-foreground text-background rounded">+ New File</button>
         <label className="px-3 py-1.5 text-sm border rounded cursor-pointer">
           Upload
-          <input type="file" accept=".md,.markdown" className="hidden" onChange={upload} />
+          <input type="file" accept=".md,.markdown" multiple className="hidden" onChange={upload} />
         </label>
         <form onSubmit={search} className="ml-auto flex gap-2">
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search files…" className="px-3 py-1.5 text-sm border rounded w-64" />
           <button type="submit" className="px-3 py-1.5 text-sm border rounded">Search</button>
         </form>
       </div>
-      <div className="border rounded divide-y">
+      {drag && <div className="border-2 border-dashed rounded p-8 text-center text-sm text-muted-foreground mb-4">Drop .md files here</div>}
+      <div className={`border rounded divide-y ${drag ? 'opacity-50' : ''}`}>
         {docs.length === 0 && <div className="p-4 text-sm text-muted-foreground">No documents</div>}
         {docs.map((doc) => (
           <div key={doc.id} className="flex items-center gap-2 p-3 hover:bg-muted/50">

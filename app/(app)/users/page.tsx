@@ -38,6 +38,7 @@ export default function UsersPage() {
         {users.map((u) => (
           <div key={u.id} className="flex items-center gap-2 p-3">
             <span className="text-sm flex-1">{u.email} <span className="text-xs text-muted-foreground">({u.role})</span></span>
+            <button onClick={async () => { const p = prompt('New password for ' + u.email); if (!p) return; const r = await fetch('/api/auth/password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetId: u.id, newPassword: p }) }); alert(r.ok ? 'Changed' : 'Failed') }} className="text-xs px-2 py-1 border rounded">Reset PW</button>
             <button onClick={() => del(u.id)} className="text-xs px-2 py-1 border rounded text-red-600">Delete</button>
           </div>
         ))}
