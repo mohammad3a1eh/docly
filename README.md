@@ -8,7 +8,7 @@ Docly is a personal knowledge‑base web app built with **Next.js 16**, **Pris
 - Auto‑save (1.5 s debounce) + manual save
 - View a beautiful read‑only page (`/doc/:slug`)
 - Serve raw Markdown for AI (`/doc/:slug/raw` – `text/markdown`)
-- Manage users (admin can create/reset passwords, delete)
+- Manage users (any user can create/reset passwords/delete; self‑deletion blocked)
 - Multi‑file drag‑and‑drop upload
 
 ## Tech Stack
@@ -64,7 +64,7 @@ You can also export a static site (no auth) – not covered here.
 app/                 # Next.js route handlers & pages
   (app)/files/…      # file manager UI
   (app)/edit/[id]/   # editor page
-  (app)/users/       # admin user management UI
+  (app)/users/       # user management (all users admin)
   (app)/settings/    # password change UI
   api/…               # REST endpoints (auth, docs, users)
 components/          # React components (FileList, TiptapEditor, …)
@@ -75,7 +75,7 @@ app/globals.css      # Tailwind + prose & table RTL styles
 
 ## Authentication Flow
 1. POST `/api/auth/login` – returns JWT in `auth` cookie.
-2. Middleware protects `/files`, `/edit`, `/users`.
+2. Proxy protects `/files`, `/edit`, `/users`.
 3. Logout button clears cookie and redirects to `/login`.
 
 ## Editing Markdown
@@ -90,7 +90,12 @@ Drag files onto the file‑list area or use the **Upload** button (supports mult
 
 ## Password Management
 - Users can change own password at `/settings` (requires current password).
-- Admin can reset any user’s password via **Reset PW** button on the Users page.
+- Any user can reset another user’s password via **Reset PW** button on the Users page.
+- Users cannot delete themselves (server returns `Cannot delete yourself`).
+
+## Users
+- All new users are created as `admin` by default.
+- Any authenticated user can list, create, and delete other users.
 
 ## Contributing
 - Fork the repo, create a feature branch, and submit a PR.
